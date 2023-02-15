@@ -1,11 +1,12 @@
 package tests;
 
-
+import io.qameta.allure.*;
 import io.restassured.response.Response;
 import lib.ApiCoreRequests;
 import lib.Assertions;
 import lib.BaseTestCase;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -21,6 +22,8 @@ public class UserAuthTest extends BaseTestCase {
     int userIdOnAuth;
     private final ApiCoreRequests apiCoreRequests = new ApiCoreRequests();
 
+    @Epic("Authorization")
+    @Feature("Authorization")
     @BeforeEach
     public void loginUser() {
         Map<String, String> authData = new HashMap<>();
@@ -34,7 +37,8 @@ public class UserAuthTest extends BaseTestCase {
         this.header = this.getHeader(responseGetAuth, "x-csrf-token");
         this.userIdOnAuth = this.getIntFromJson(responseGetAuth,"user_id");
     }
-
+    @Description("This test successfully authorize")
+    @DisplayName("Test positive authUser")
     @Test
     public void testAuthUser() {
         Response responseCheckAuth = apiCoreRequests
@@ -43,6 +47,9 @@ public class UserAuthTest extends BaseTestCase {
         Assertions.assertJsonByName(responseCheckAuth, "user_id", userIdOnAuth);
     }
 
+    @Description("This test checks authorization status w/o sending auth cookie or token")
+    @DisplayName("Bad test auth user")
+    @Severity(SeverityLevel.CRITICAL)
     @ParameterizedTest
     @ValueSource(strings = {"cookie", "headers"})
     public void testNegativeAuthUser(String condition) {
